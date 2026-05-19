@@ -1,0 +1,9 @@
+name = "apple-pay-domain-association"
+main = "src/index.ts"
+compatibility_date = "2025-05-19"
+
+# Bundle .txt files as string imports (see src/index.ts).
+[[rules]]
+type = "Text"
+globs = ["**/*.txt"]
+fallthrough = true
