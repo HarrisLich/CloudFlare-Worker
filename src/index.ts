@@ -1,7 +1,9 @@
 import associationFile from "../apple-developer-merchantid-domain-association.txt";
 
-const ASSOCIATION_PATH =
-  "/.well-known/apple-developer-merchantid-domain-association.txt";
+const ASSOCIATION_PATHS = new Set([
+  "/.well-known/apple-developer-merchantid-domain-association",
+  "/.well-known/apple-developer-merchantid-domain-association.txt",
+]);
 
 const RESPONSE_HEADERS: HeadersInit = {
   "Content-Type": "text/plain; charset=utf-8",
@@ -12,7 +14,7 @@ export default {
   fetch(request: Request): Response {
     const { pathname } = new URL(request.url);
 
-    if (pathname === ASSOCIATION_PATH) {
+    if (ASSOCIATION_PATHS.has(pathname)) {
       return new Response(associationFile, {
         status: 200,
         headers: RESPONSE_HEADERS,

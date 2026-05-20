@@ -1,8 +1,9 @@
 # Apple Pay domain association (Cloudflare Worker)
 
-Serves `apple-developer-merchantid-domain-association.txt` at:
+Serves `apple-developer-merchantid-domain-association.txt` at both:
 
-`/.well-known/apple-developer-merchantid-domain-association.txt`
+- `/.well-known/apple-developer-merchantid-domain-association`
+- `/.well-known/apple-developer-merchantid-domain-association.txt`
 
 ## Setup
 
@@ -24,6 +25,8 @@ npm run dev
 
 Then open:
 
+http://localhost:8787/.well-known/apple-developer-merchantid-domain-association
+
 http://localhost:8787/.well-known/apple-developer-merchantid-domain-association.txt
 
 ## Deploy
@@ -34,22 +37,23 @@ npm run deploy
 
 ## Attach to your domain
 
-In the Cloudflare dashboard (or via Wrangler routes), add a **Worker route** on the zone that serves your site, for example:
+In the Cloudflare dashboard (or via Wrangler routes), add **Worker routes** on the zone that serves your site. Add one route per path (or use a single pattern if your setup supports it):
 
-- Route: `www.victorymenshealth.com/.well-known/apple-developer-merchantid-domain-association.txt`
-- Worker: `apple-pay-domain-association`
+- `www.victorymenshealth.com/.well-known/apple-developer-merchantid-domain-association`
+- `www.victorymenshealth.com/.well-known/apple-developer-merchantid-domain-association.txt`
 
-If your origin already handles other paths, use a route pattern that matches only this path so the worker does not intercept the rest of the site.
+If your origin already handles other paths, use route patterns that match only these paths so the worker does not intercept the rest of the site.
 
 Alternatively, add to `wrangler.toml` after deploy:
 
 ```toml
 routes = [
+  { pattern = "www.victorymenshealth.com/.well-known/apple-developer-merchantid-domain-association", zone_name = "victorymenshealth.com" },
   { pattern = "www.victorymenshealth.com/.well-known/apple-developer-merchantid-domain-association.txt", zone_name = "victorymenshealth.com" }
 ]
 ```
 
-Replace the hostname and zone with yours.
+Replace the hostname and zone with yours. The `www` hostname must be **Proxied** (orange cloud) for routes to run.
 
 ## Updating the file
 
@@ -59,10 +63,6 @@ Replace `apple-developer-merchantid-domain-association.txt` in the project root 
 npm run deploy
 ```
 
-## Note on Apple’s default URL
+## Apple Pay
 
-Apple’s documentation expects the file **without** a `.txt` suffix:
-
-`/.well-known/apple-developer-merchantid-domain-association`
-
-This worker serves only the `.txt` path you requested. If a provider or checker still hits the extensionless URL, add a second route in `src/index.ts` or point that path at this worker as well.
+Apple’s documentation uses the extensionless path. This worker serves both URLs with the same file content.
